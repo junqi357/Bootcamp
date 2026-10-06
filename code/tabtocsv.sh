@@ -18,10 +18,13 @@ if [[ ! -r "$1" ]]; then
     exit 1
 fi
 
+mkdir -p ../results
+output_file="../results/$(basename "$1" .tsv).csv"
+
 echo "Creating a comma delimited version of $1 ..."
 
-if tr '\t' ',' < "$1" > "$1.csv"; then
-    printf 'Done!\n'
+if tr '\t' ',' < "$1" > "$output_file"; then
+    printf 'Done! Output: %s\n' "$output_file"
 else
     printf 'Error: conversion failed.\n' >&2
     exit 1
