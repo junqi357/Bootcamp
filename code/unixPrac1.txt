@@ -1,27 +1,28 @@
 #1 
-#"wc -l" meant to count the number of newline character. 
-#In file 407228326.fasta and 407228412.fasta, no newline character included in the last line. Therefor reported counts are one line less than the number of text lines.
+#"wc -l" meant to counts the number of newline character. 
+#In file 407228326.fasta and 407228412.fasta, no newline characters included in the last line. Therefor reported counts are one line less than the number of text lines.
 wc -l ../data/fasta/407228326.fasta ../data/fasta/407228412.fasta ../data/fasta/e_coli.fasta
 #2
-#"tail -n +2"  print from the second line to the last line.
-#Since the first line of e_coli.fasta is title, so this command can skip the title and only print sequence data.
+#"tail -n +2"  prints from the second line to the last line.
+#Since the first line of e_coli.fasta is header, so this command can skip the title and only print sequence data.
 tail -n +2 ../data/fasta/e_coli.fasta
 #3 
-#"tail -n +2" is used to skip the title as in #2
+#"tail -n +2" is used to skip the header as in #2
 #"tr -d '\r\n'" is used to remove line endings
-#and "wc -c" counts remaining bytes. Each sequence symbol occupies one byte, so this gives the sequence leghth.
+#and "wc -c" counts remaining bytes. Each sequence symbol occupies one byte, so this gives the sequence length.
 # Ambiguous nucleotide symbols are included because they also represent sequence positions.
 tail -n +2 ../data/fasta/e_coli.fasta | tr -d '\r\n' | wc -c
 #4
-#"tail -n +2" is used to skip the title as in #2.
+#"tail -n +2" is used to skip the header as in #2.
 #"tr -d '\r\n'" is used to remove line endings, so that ATGC can be matched across lines.
 #"grep -o 'ATGC'" is used to print each ATGC match on a separate line (-o).
 #"wc -l" is used to count these matches to get the number of ATGC occurrences.
 #Ambiguous nucleotide symbols are kept to avoid creating false matches.
 tail -n +2 ../data/fasta/e_coli.fasta | tr -d '\r\n' | grep -o 'ATGC' | wc -l
 #5
-#"tail -n +2" is used to skip the title.
+#"tail -n +2" is used to skip the header.
 #"grep -o '[AT]'" prints each A or T on a separate line, and "grep -o '[GC]'" does the same for G or C.
+# The supplied sequence has a nonzero GC count. If G+C were zero, the ratio would be undefined.
 #"wc -l" is used to count the matches in each group. Ambiguous nucleotide symbols are not matched.
 #"printf" puts the AT and GC counts on one line, separated by a space.
 #In "awk", "$1" is the AT count and "$2" is the GC count; "print $1/$2" outputs their ratio. It is used here because it supports decimal division, while Bash arithmetic only supports integers.
