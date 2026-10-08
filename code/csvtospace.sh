@@ -19,7 +19,7 @@ if [[ ! -r "$1" ]]; then
 fi
 
 mkdir -p ../results
-output_file="../results/$(basename "$1" .csv).space.txt"
+output_file="../results/$(basename "$1").txt"
 
 if tr ',' ' ' < "$1" > "$output_file"; then
     printf 'Done! Output: %s\n' "$output_file"
