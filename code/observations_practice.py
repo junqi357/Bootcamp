@@ -7,6 +7,8 @@ def load_observations(path):
 
 
 def parse_count(count_text):
+    if not isinstance(count_text, str):
+        raise ValueError("Count must be text")
     if count_text == "":
         return None
     count = int(count_text)
@@ -22,6 +24,9 @@ def parse_count(count_text):
 #Manual check, for site A, the first count is 2, so the total becomes 2. The B record is checked but not included. Another A record has a missing count, so missing_count becomes 1. The last A record is a duplicate and is skipped. Therefore, the expected result is (2, 1). For site B, the known count is 0 and there are no missing records, so the expected result is (0, 0).
 
 def summarise_site(rows, site):
+    if not isinstance(rows, list):
+        raise ValueError("Rows must be a list")
+
     if not isinstance(site, str) or site == "":
         raise ValueError("Site must be non-empty text")
 
@@ -30,6 +35,9 @@ def summarise_site(rows, site):
     missing_count = 0
 
     for row in rows:
+        if not isinstance(row, dict):
+            raise ValueError("Each row must be a dictionary")
+
         if set(row) != {"site", "date", "count"}:
             raise ValueError("Invalid fields")
 
