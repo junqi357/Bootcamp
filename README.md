@@ -46,3 +46,16 @@ These scripts only replace characters but however do not handle quoting or escap
 Commas inside quoted fields would also be replaced, and space-separated output cannot clearly distinguish spaces within fields. 
 Users should run the scripts from code/ because they use relative paths. 
 They check that the input is a readable regular file, but do not check whether its contents follow CSV or TSV format.
+
+
+# Week 2 Assignment 2: Tree-survey Practical in Python
+## Workflow Purpose
+This workflow will turn the supplied raw tree-survey records into validated, consistently formatted data for reuse in Assignment 3 in R. Using the supplied metadata, the program will apply permitted text cleaning, check required values, measurements and duplicate identifiers, and separate accepted records from rejected rows. It will preserve the raw input and produce three reproducible CSV outputs: cleaned records, rejected-row reports with all applicable reasons, and counts of accepted oaks by species.
+
+## Planned Algorithm
+The program will begin by reading the tree records from 'data/silwood_trees_raw.csv', using 'data/silwood_trees_metadata.md' as the reference for validation rules and output formats.
+After checking the CSV column names, the program will create two empty lists. One will store accepted records, and the other will store rejected records and their reasons. A set will store the record numbers ('record_id') of accepted records.
+The program will process each record in input order and note its row number, counting the header as row 1. After applying the permitted text cleaning, it will check required values, record number formats, locations, genus–species combinations and numeric measurements against the metadata rules. It will also check whether an accepted record already uses the same record number. Any problems found will be recorded as rejection reasons in the required order.
+When a record passes every check, the program will save its cleaned values and add its record number to the set. When a record is rejected, the program will save its row number in the original CSV, its record number with surrounding spaces removed, and all rejection reasons. A later valid record can still use the same record number as a rejected record.
+The accepted records will be sorted by 'record_id', and rejected records will be listed in their original row order. The oak summary will count accepted records whose genus is exactly Quercus, with the counts grouped and sorted by species.
+Finally, the program will create 'results/' if needed and write three CSV files: 'silwood_trees_clean.csv' for accepted records, 'silwood_tree_issues.csv' for rejected records and their reasons, and 'oak_species_counts.csv' for oak counts. These files will use the column order and formats specified in the metadata. Each run will replace earlier output files, while keeping the original input file unchanged.
