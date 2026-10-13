@@ -161,3 +161,91 @@ dim(plants)      # 行数和列数，得到 3 2：三行、两列
 names(plants)    # 列名，得到 "species" "height_cm"
 class(plants)    # 对象类型，得到 "data.frame"
 tail(plants)     # 默认显示后六行，这里也显示全部三行
+
+Col1 <- 1:10            # 第一列：整数 1 到 10
+Col2 <- LETTERS[1:10]   # 第二列：大写字母 A 到 J
+Col3 <- runif(10)       # 第三列：生成 10 个介于 0 和 1 之间的随机数
+
+MyDF <- data.frame(Col1, Col2, Col3) # 把三列组合成数据框
+MyDF                               # 显示表格
+
+#assign names to columns
+names(MyDF) <- c("MyFirstColumn", "My Second Column", "My.Third.Column")
+# 按顺序修改三列的名称
+
+names(MyDF)
+# 得到 "MyFirstColumn" "My Second Column" "My.Third.Column"
+
+MyDF$MyFirstColumn
+# 用 $ 取出第一列，得到 1 到 10
+
+colnames(MyDF)[2] <- "MySecondColumn"
+# 把第二列名称改成连在一起的 MySecondColumn，方便使用 $
+
+MyDF$MySecondColumn
+# 取出第二列，得到 "A" 到 "J"
+
+#access elements by numerical indexing
+MyDF[, 1]  # 取所有行的第 1 列
+MyDF[1, 1] # 取第 1 行、第 1 列的值
+
+MyDF[c("MyFirstColumn", "My.Third.Column")]
+# 按列名取出第 1、3 列，保留表格形式
+
+class(MyDF) # 查看对象类型
+str(MyDF)   # 查看行数、列数和每列的数据类型
+head(MyDF)  # 查看前 6 行
+tail(MyDF)  # 查看后 6 行
+
+##Matrix
+mat1 <- matrix(1:25, 5, 5)
+# 把 1 到 25 放进 5 行、5 列的矩阵，默认按列填入
+
+mat1
+
+mat1 <- matrix(1:25, 5, 5, byrow = TRUE)
+# byrow = TRUE：改为按行填入
+
+mat1
+dim(mat1) # 查看行数、列数
+
+mat1[1, 1] <- "one" # 把第 1 行、第 1 列改成文字
+mat1
+
+##Lists
+MyList <- list(1L, "p", FALSE, 0.001)
+# 四项分别是整数、文字、逻辑值、小数
+
+MyList
+
+MyList <- list(
+  species = c("Quercus robur", "Fraxinus excelsior"),
+  age = c(123, 84)
+)
+# species 项保存物种名称向量，age 项保存年龄向量
+
+MyList
+
+MyList[[1]]          # 取出列表第 1 项的内容
+MyList$species       # 按名称取出同一项
+MyList[["species"]]  # 另一种按名称取内容的写法
+
+MyList[[1]][1]       # 先取第 1 项，再取其中第 1 个值
+MyList$species[1]    # 同样取第 1 个物种名称
+
+##Matrix vs Data frame
+# Matrix：二维结构，所有值使用同一种数据类型. 适合矩阵运算和大量数值计算，存储较紧凑。
+# Data frame：二维表格，不同列可以使用不同数据类型，各列等长。适合保存观察记录和进行统计分析。保存列名等额外信息，通常比同样数据的矩阵占用更多内存。
+
+MyMat <- matrix(1:8, 4, 4)
+# 创建 4 行、4 列的矩阵；1 到 8 重复使用，默认按列填入
+
+MyMat
+
+MyDF <- as.data.frame(MyMat)
+# 把矩阵转换成数据框，保存为 MyDF
+
+MyDF
+
+object.size(MyMat) # 查看矩阵占用的内存，单位 bytes
+object.size(MyDF)  # 查看数据框占用的内存
