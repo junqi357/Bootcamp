@@ -1,25 +1,83 @@
 observations <- read.csv(
-  "data/bootcamp_observations.csv",
-  colClasses = "character",
-  na.strings = "",
-  check.names = FALSE
+    "data/bootcamp_observations.csv",
+    colClasses = "character",  # Read every column as character data
+    na.strings = "",           # Treat empty fields as NA
+    check.names = FALSE        # Preserve the original column names
 )
-# colClasses = "character" 将所有列读成文字。
-# na.strings = "" 将空字段识别为缺失值 NA。
-# check.names = FALSE 保留文件原有的列名。
 
 str(observations)
-# 查看记录数、列数和各列类型。
-
 print(observations)
-# print() 明确打印对象内容，运行整个脚本时也会显示。
 
-expected_columns <- c("site", "date", "count")
+read_observations <- function(path) {
 
-names(observations)
+    data <- read.csv(
+        path,
+        colClasses = "character",
+        na.strings = "",
+        check.names = FALSE
+    )
 
-identical(names(observations), expected_columns)
-# identical() 检查两个对象是否完全相同，包括顺序。
+    expected_columns <- c("site", "date", "count")
 
-stopifnot(identical(names(observations), expected_columns))
-# stopifnot() 在条件为 FALSE 时停止运行并报错。
+    if (!identical(names(data), expected_columns)) {  # Check exact column names and order
+        stop("Invalid columns: expected site, date, count")
+    }
+
+    for (column in c("site", "date")) {               # Check both required text columns
+
+        values <- data[[column]]
+
+        invalid <- is.na(values) | trimws(values) == ""  # Find missing or blank values
+
+        if (any(invalid)) {                           # Stop if any row contains invalid text
+            row <- which(invalid)[1]
+
+            stop(
+                paste0(
+                    basename(path),
+                    ": CSV line ", row + 1,
+                    ", column '", column,
+                    "': missing required text"
+                )
+            )
+        }
+    }
+
+    counts <- data$count
+
+    for (i in seq_along(counts)) {                    # Check each count separately
+
+        value <- counts[i]
+
+        if (is.na(value)) {
+            next                                      # Leave missing counts as NA
+        }
+
+        if (!grepl("^(0|[1-9][0-9]*)$", value)) {     # Validate non-negative integer text
+            stop(
+                paste0(
+                    basename(path),
+                    ": CSV line ", i + 1,
+                    ", column 'count': found '", value,
+                    "'; expected an empty field or a non-negative integer."
+                )
+            )
+        }
+
+        number <- suppressWarnings(as.integer(value))  # Convert a valid count to integer
+
+        if (is.na(number)) {                          # Catch values outside the integer range
+            stop(
+                paste0(
+                    basename(path),
+                    ": CSV line ", i + 1,
+                    ", column 'count': integer is outside the supported range."
+                )
+            )
+        }
+    }
+
+    data$count <- as.integer(data$count)
+
+    return(data)
+}
