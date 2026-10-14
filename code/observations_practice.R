@@ -81,3 +81,90 @@ read_observations <- function(path) {
 
     return(data)
 }
+
+summarise_observations <- function(data) {
+
+    data <- data[!duplicated(data), ]           # Remove exact duplicate rows
+
+    sites <- unique(data$site)                  # Get each site name once
+
+    results <- data.frame(
+        site = character(0),
+        total_known = integer(0),
+        missing_count = integer(0)
+    )                                           # Create an empty data frame for the summary
+
+    for (site in sites) {                       # Process each site separately
+
+        counts <- data$count[data$site == site] # Select counts for this site
+
+        missing_count <- sum(is.na(counts))     # Count missing observations
+
+        if (all(is.na(counts))) {               # Check whether every count is missing
+            total_known <- NA_integer_
+        } else {
+            total_known <- sum(counts, na.rm = TRUE)  # Sum known counts
+        }
+
+        site_result <- data.frame(
+            site = site,
+            total_known = total_known,
+            missing_count = missing_count
+        )                                       # Store the summary for the current site
+
+        results <- rbind(results, site_result)  # Add the current site to the results
+    }
+
+    return(results)
+}
+
+# Read and summarise the ordinary observations
+
+ordinary <- read_observations(
+    "data/bootcamp_observations.csv"
+)
+
+ordinary_summary <- summarise_observations(ordinary)
+
+print(ordinary_summary)
+
+
+# Read and summarise the boundary observations
+
+boundary <- read_observations(
+    "data/bootcamp_observations_boundary.csv"
+)
+
+boundary_summary <- summarise_observations(boundary)
+
+print(boundary_summary)
+
+# Check the ordinary observations
+
+stopifnot(ordinary_summary$total_known[ordinary_summary$site == "A"] == 2)
+stopifnot(ordinary_summary$missing_count[ordinary_summary$site == "A"] == 1)
+
+stopifnot(ordinary_summary$total_known[ordinary_summary$site == "B"] == 0)
+stopifnot(ordinary_summary$missing_count[ordinary_summary$site == "B"] == 0)
+
+
+# Check the boundary observations
+
+stopifnot(is.na(boundary_summary$total_known[boundary_summary$site == "C"]))
+stopifnot(boundary_summary$missing_count[boundary_summary$site == "C"] == 2)
+
+stopifnot(boundary_summary$total_known[boundary_summary$site == "D"] == 0)
+stopifnot(boundary_summary$missing_count[boundary_summary$site == "D"] == 0)
+
+# Check that invalid observations produce an error
+
+invalid_result <- tryCatch(
+    read_observations("data/bootcamp_observations_invalid.csv"),
+    error = function(e) e                     # Capture the error instead of stopping the script
+)
+
+stopifnot(inherits(invalid_result, "error"))  # Check that an error occurred
+
+stopifnot(
+    grepl("found '-1'", conditionMessage(invalid_result), fixed = TRUE)
+)                                             # Check that the error identifies the invalid count
