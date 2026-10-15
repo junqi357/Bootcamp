@@ -1,16 +1,37 @@
 """Testing the Silwood tree-survey cleaning rules by small records."""
 
 from clean_silwood_trees import (
+    load_records,
     validate_record,
     process_records,
     summarise_oaks,
 )
 
+import csv
 import shutil
 import subprocess
 import sys
 import tempfile
 from pathlib import Path
+
+
+# Create a temporary CSV with incorrect column names.
+# Check that load_records() rejects the file with ValueError.
+with tempfile.TemporaryDirectory() as temporary_directory:
+    invalid_csv = Path(temporary_directory) / "invalid.csv"
+
+    invalid_csv.write_text(
+        "record_id,location,genus,species,distance,angle\n"
+        "ST001,Silwood Bottom,Quercus,robur,12.5,35\n",
+        encoding="utf-8",
+    )
+
+    try:
+        load_records(invalid_csv)
+    except ValueError:
+        pass
+    else:
+        raise AssertionError("Incorrect CSV columns were accepted")
 
 
 # Give validate_record() a complete, valid tree record.
@@ -392,3 +413,41 @@ with tempfile.TemporaryDirectory() as temporary_directory:
         assert output_path.read_bytes() == first_outputs[name]
 
     assert temporary_input.read_bytes() == original_input
+
+# Check the output columns and record counts against the supplied data.
+    expected_outputs = {
+        "silwood_trees_clean.csv": (
+            ["record_id", "location", "genus", "species",
+             "distance_m", "angle_degrees"],
+            24,
+        ),
+        "silwood_tree_issues.csv": (
+            ["source_row", "record_id", "reasons"],
+            12,
+        ),
+        "oak_species_counts.csv": (
+            ["species", "count"],
+            2,
+        ),
+    }
+
+    for name, (expected_fields, expected_count) in expected_outputs.items():
+        output_path = temporary_root / "results" / name
+
+        with output_path.open(newline="", encoding="utf-8") as source:
+            reader = csv.DictReader(source)
+            rows = list(reader)
+
+        assert reader.fieldnames == expected_fields
+        assert len(rows) == expected_count
+
+ # Check the oak species counts in the generated CSV.
+    oak_path = temporary_root / "results" / "oak_species_counts.csv"
+
+    with oak_path.open(newline="", encoding="utf-8") as source:
+        oak_rows = list(csv.DictReader(source))
+
+    assert oak_rows == [
+        {"species": "petraea", "count": "4"},
+        {"species": "robur", "count": "4"},
+    ]
