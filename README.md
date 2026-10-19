@@ -28,22 +28,24 @@ and are separate from the assessed assignment files.
 'code/unixPrac1.txt' contains the one line commands for five FASTA questions.
 '#1' to '#5' are used to identify the questions. Other comments starting with '#' are used to explain how the commands work (Users should only copy the command lines when running them).
 The questions cover file line counts, displaying the sequence, sequence length, ATGC occurrences and the AT/GC ratio.
+Question 5 uses awk to calculate (A+T)/(G+C) from uppercase canonical-base counts. Ambiguous symbols are excluded. The supplied sequence has a nonzero GC count; a zero GC count would make the ratio undefined.
 
 'code/tabtocsv.sh' converts tabs to commas. 
 'code/csvtospace.sh' converts commas to spaces. 
 Besides their main purpose, both scripts check the number of arguments and whether the input is a readable regular file while running. 
 They preserve empty fields, report errors with a nonzero exit status, and show the output path when successful.
 
+week1/ and git-practice/ contain retained classroom practice material. Assignment 1 files are located in the root-level code/ and data/ directories.
+
 ## How to run
 
 Users need Bash and the following tools: tail, grep, wc, awk, tr, mkdir, basename and printf, for testing cmp will also be used. 
-From the project root, users should enter the code directory with 'cd code', then run the five command lines in unixPrac1.txt individually in the terminal. 
+For the FASTA answers, enter code/ and run the five command lines in unixPrac1.txt individually. 
 Lines starting with # are comments and do not need to be copied.
+To run both converter scripts from the repository root, use:
 
-To run the converters, use:
-
-    bash tabtocsv.sh ../data/tab-example.tsv
-    bash csvtospace.sh ../data/temperatures/1800.csv
+    bash tabtocsv.sh data/tab-example.tsv
+    bash csvtospace.sh data/temperatures/1800.csv
 
 The first command converts tabs in the input file to commas and creates results/tab-example.tsv.csv. 
 The second converts commas to spaces and creates results/1800.csv.txt. 
@@ -67,7 +69,7 @@ All four comparisons showed that the inputs were unchanged.
 
 These scripts only replace characters but however do not handle quoting or escaping. 
 Commas inside quoted fields would also be replaced, and space-separated output cannot clearly distinguish spaces within fields. 
-Users should run the scripts from code/ because they use relative paths. 
+Run the converter scripts from the repository root. Their output paths are relative to the current working directory.
 They check that the input is a readable regular file, but do not check whether its contents follow CSV or TSV format.
 
 

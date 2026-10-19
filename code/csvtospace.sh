@@ -18,8 +18,8 @@ if [[ ! -r "$1" ]]; then
     exit 1
 fi
 
-mkdir -p ../results
-output_file="../results/$(basename "$1").txt"
+mkdir -p results
+output_file="results/$(basename "$1").txt"
 
 if tr ',' ' ' < "$1" > "$output_file"; then
     printf 'Done! Output: %s\n' "$output_file"

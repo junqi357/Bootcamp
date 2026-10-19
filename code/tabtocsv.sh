@@ -18,8 +18,8 @@ if [[ ! -r "$1" ]]; then
     exit 1
 fi
 
-mkdir -p ../results
-output_file="../results/$(basename "$1").csv"
+mkdir -p results
+output_file="results/$(basename "$1").csv"
 
 echo "Creating a comma delimited version of $1 ..."
 
