@@ -126,3 +126,65 @@ The code uses methods covered in MQB’s Biological Computing in Python, especia
 
 This workflow is designed for the small survey provided, so it reads the whole CSV into memory before checking the records. As the file gets larger, this approach needs more memory. To handle much larger surveys, the code could be changed to read and check one record at a time.
 
+
+
+
+# Week 3: Tree Heights and Pound Hill Analysis
+
+## Directories
+
+- `code/TreeHeight.R` – Calculates tree heights from the supplied tree data.
+- `code/get_TreeHeight.R` – Runs the same calculation using a CSV path supplied in the command.
+- `code/run_get_TreeHeight.sh` – Checks the command-line script using the supplied data and a small test dataset.
+- `code/pound_hill_analysis.R` – Calculates and plots mean quadrat species richness for each plot, and compares richness with abundance.
+- `data/trees.csv` – Original tree measurements.
+- `data/pound_hill_data.csv` – Original Pound Hill plant counts and sampling labels.
+- `data/pound_hill_meta_data.csv` – Descriptions of the Pound Hill fields and the meaning of blank counts.
+
+## How the Code Works
+
+“trees.csv” contains the species, horizontal distance and angle for each tree, which “TreeHeight.R” uses to calculate height. After reading the data, the code checks that the required columns are present and that distances and angles are finite numbers within the allowed ranges. “TreeHeight()” then converts the angles to radians and calculates height by multiplying distance by the tangent of the angle. The results are added as “height_m” and saved to “results/TreeHts.csv”, keeping the original records in order.
+
+Building on this, “get_TreeHeight.R” takes the input path from the run command, allowing the same checks and calculation to be used with other CSV files containing the same three columns. The output is named after the input file, so “trees.csv” produces “trees_treeheights.csv” under “results/” directory. 
+
+The calculation is checked through “run_get_TreeHeight.sh”, which runs both the supplied data and a small test dataset. The test includes a tree measured at 8 metres and 45 degrees, with an expected height of 8 metres. The script checks the output columns, row counts, original measurements and calculated height, then repeats a run to confirm that the file is replaced consistently. It also checks that leaving out the input argument produces the expected error message.
+
+“pound_hill_data.csv” contains sampling labels and species counts in a wide table, so “pound_hill_analysis.R” first transposes the data and reshapes it into long form. Each row then holds the count of one species in one quadrat. The accompanying “pound_hill_meta_data.csv” explains that blank counts represent observed absences, which supports converting them to zeros during this step. The code then checks that counts are finite, non-negative numbers and uses the full sampling labels to identify distinct quadrats and plots.
+
+The reshaped data is used to count species with a positive count in each quadrat, giving “Richness”. These values are then averaged within each plot to give “MeanRichness”. Since the number of sampled quadrats varies among plots, this gives each plot equal weight in the treatment comparison. The summary is saved to “results/pound_hill_plot_richness.csv” and shown in a scatter plot grouped by cultivation treatment, saved to “results/pound_hill_plot_richness.pdf”. Each point represents one plot’s mean quadrat richness, making differences within and among treatments visible.
+
+The same approach is also used for abundance, starting with the total number of individual plants in each quadrat and then averaging these totals within each plot. Finally, the code calculates treatment averages for both richness and abundance and prints them in the terminal, allowing the patterns in species numbers and plant numbers to be compared.
+
+## Running Scripts and Expected Results
+
+All commands are run from the repository root. The tree-height scripts use base R, while the Pound Hill analysis also requires “tidyr” and “ggplot2” to be installed.
+
+“TreeHeight.R” is run with the following command:
+`Rscript code/TreeHeight.R`
+
+After the run, “results/TreeHts.csv” should contain 120 records, with “height_m” added after the original three columns so that each calculated height stays alongside its measurements. To check this output, the row count and original record order were compared, and the first record’s distance and angle were entered into the formula independently. This gave approximately 27.80212 metres, matching the saved height. The script was then run again through “source()”, confirming that the output was replaced with the same values.
+
+The general version takes an input path when it runs, so the command for the supplied data is:
+`Rscript code/get_TreeHeight.R data/trees.csv`
+
+This run should save the same calculated results to “results/trees_treeheights.csv”. Its checks are brought together in the Shell script:
+`bash code/run_get_TreeHeight.sh`
+
+The script checks the output structure and calculations, then repeats a run to check file replacement. The test tree is measured at 8 metres and 45 degrees, giving an expected height of 8 metres. It also deliberately leaves out the input argument to check error handling, so the “Usage” message is an expected part of the process. Once all checks pass, it should display “All tree-height script checks passed.”, which was confirmed during the run.
+
+The Pound Hill analysis is run with:
+`Rscript code/pound_hill_analysis.R`
+
+The run should create “results/pound_hill_plot_richness.csv” and “results/pound_hill_plot_richness.pdf”. The CSV should contain “Cultivation”, “Block”, “Plot” and “MeanRichness”, with one row for each of the 12 plots. Checks confirmed 41 species, 59 quadrats and 12 plots, with each plot appearing once in the summary. Two successive runs in fresh R processes then produced the same summary values, confirming that the output could be recreated.
+
+The PDF should show each plot’s mean quadrat richness as one point, allowing the three cultivation treatments to be compared. May has the highest typical richness, and plot values vary within every treatment. The abundance comparison printed in the terminal also shows the highest plant numbers in October, illustrating how richness and abundance describe different aspects of the vegetation.
+
+## Sources
+
+The “TreeHeight()” function comes from “An example utility function” in MQB. Input validation, command-line arguments and the Shell check script were added following the two tree-height practicals. For Pound Hill, the import and reshaping steps reuse the transpose, blank-to-zero conversion and “pivot_longer()” code from earlier classroom scripts. Richness and abundance summaries, plotting and interpretation were then added following the current practical.
+
+Once each script was complete and running, the Python and R code was checked using their respective debugging tools. ChatGPT was used to brainstorm ways to make the scatter plot clearer and more visually appealing, while the final plotting code was written manually. ChatGPT also helped refine some wording and correct grammar in the README.
+
+## Limitations
+
+“get_TreeHeight.R” uses the input filename to name its output. If files in different folders have the same name, they will share an output path, so a later run may overwrite a result that is still needed. For Pound Hill, the observed differences in richness may be related to cultivation timing, while assessing this relationship requires more information about treatment assignment, block layout and plot independence.
