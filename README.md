@@ -44,8 +44,8 @@ For the FASTA answers, enter code/ and run the five command lines in unixPrac1.t
 Lines starting with # are comments and do not need to be copied.
 To run both converter scripts from the repository root, use:
 
-    bash tabtocsv.sh data/tab-example.tsv
-    bash csvtospace.sh data/temperatures/1800.csv
+    bash code/tabtocsv.sh data/tab-example.tsv
+    bash code/csvtospace.sh data/temperatures/1800.csv
 
 The first command converts tabs in the input file to commas and creates results/tab-example.tsv.csv. 
 The second converts commas to spaces and creates results/1800.csv.txt. 
@@ -145,7 +145,7 @@ This workflow is designed for the small survey provided, so it reads the whole C
 
 “trees.csv” contains the species, horizontal distance and angle for each tree, which “TreeHeight.R” uses to calculate height. After reading the data, the code checks that the required columns are present and that distances and angles are finite numbers within the allowed ranges. “TreeHeight()” then converts the angles to radians and calculates height by multiplying distance by the tangent of the angle. The results are added as “height_m” and saved to “results/TreeHts.csv”, keeping the original records in order.
 
-Building on this, “get_TreeHeight.R” takes the input path from the run command, allowing the same checks and calculation to be used with other CSV files containing the same three columns. The output is named after the input file, so “trees.csv” produces “trees_treeheights.csv” under “results/” directory. 
+Building on this, “get_TreeHeight.R” takes the input path from the run command, allowing the same checks and calculation to be used with other CSV files containing the same three columns. The output is named after the input file, so “trees.csv” produces “trees_treeheights.csv” under “results/” directory. Both scripts use the same input checks and tree-height formula. "TreeHeight.R" uses a fixed input and output path, while "get_TreeHeight.R" obtains the input path from a command-line argument and builds the output filename from its basename.
 
 The calculation is checked through “run_get_TreeHeight.sh”, which runs both the supplied data and a small test dataset. The test includes a tree measured at 8 metres and 45 degrees, with an expected height of 8 metres. The script checks the output columns, row counts, original measurements and calculated height, then repeats a run to confirm that the file is replaced consistently. It also checks that leaving out the input argument produces the expected error message.
 
@@ -162,7 +162,7 @@ All commands are run from the repository root. The tree-height scripts use base 
 “TreeHeight.R” is run with the following command:
 `Rscript code/TreeHeight.R`
 
-After the run, “results/TreeHts.csv” should contain 120 records, with “height_m” added after the original three columns so that each calculated height stays alongside its measurements. To check this output, the row count and original record order were compared, and the first record’s distance and angle were entered into the formula independently. This gave approximately 27.80212 metres, matching the saved height. The script was then run again through “source()”, confirming that the output was replaced with the same values.
+Running "Rscript code/TreeHeight.R" produced "results/TreeHts.csv" with 120 records and the required four columns. Comparing the original three columns with "data/trees.csv" confirmed that the measurements and row order were preserved. The first record, Populus tremula, has a horizontal distance of 31.66583 m and an angle of 41.28264 degrees. Calculating its height separately using "distance * tan(angle * pi / 180)" gave approximately 27.80212 m, matching the saved result.
 
 The general version takes an input path when it runs, so the command for the supplied data is:
 `Rscript code/get_TreeHeight.R data/trees.csv`
@@ -170,12 +170,12 @@ The general version takes an input path when it runs, so the command for the sup
 This run should save the same calculated results to “results/trees_treeheights.csv”. Its checks are brought together in the Shell script:
 `bash code/run_get_TreeHeight.sh`
 
-The script checks the output structure and calculations, then repeats a run to check file replacement. The test tree is measured at 8 metres and 45 degrees, giving an expected height of 8 metres. It also deliberately leaves out the input argument to check error handling, so the “Usage” message is an expected part of the process. Once all checks pass, it should display “All tree-height script checks passed.”, which was confirmed during the run.
+The script checks the output structure and calculations, then repeats a run to check file replacement. The test tree is measured at 8 metres and 45 degrees, giving an expected height of 8 metres. It also deliberately leaves out the input argument to check error handling, so the “Usage” message is an expected part of the process. Once all checks pass, meaning the final version completed successfully and will display “All tree-height script checks passed.”
 
 The Pound Hill analysis is run with:
 `Rscript code/pound_hill_analysis.R`
 
-The run should create “results/pound_hill_plot_richness.csv” and “results/pound_hill_plot_richness.pdf”. The CSV should contain “Cultivation”, “Block”, “Plot” and “MeanRichness”, with one row for each of the 12 plots. Checks confirmed 41 species, 59 quadrats and 12 plots, with each plot appearing once in the summary. Two successive runs in fresh R processes then produced the same summary values, confirming that the output could be recreated.
+The run should create “results/pound_hill_plot_richness.csv” and “results/pound_hill_plot_richness.pdf”. The CSV should contain “Cultivation”, “Block”, “Plot” and “MeanRichness”, with one row for each of the 12 plots. Checks confirmed 41 species, 59 quadrats and 12 plots, with each plot appearing once in the summary. The analysis was run twice using separate "Rscript" calls. Comparing the two saved CSV files with "cmp" confirmed identical contents. The regenerated PDF was opened and checked against the table for treatment labels, plot values and readable axis labels.
 
 The PDF should show each plot’s mean quadrat richness as one point, allowing the three cultivation treatments to be compared. May has the highest typical richness, and plot values vary within every treatment. The abundance comparison printed in the terminal also shows the highest plant numbers in October, illustrating how richness and abundance describe different aspects of the vegetation.
 
@@ -183,7 +183,9 @@ The PDF should show each plot’s mean quadrat richness as one point, allowing t
 
 The “TreeHeight()” function comes from “An example utility function” in MQB. Input validation, command-line arguments and the Shell check script were added following the two tree-height practicals. For Pound Hill, the import and reshaping steps reuse the transpose, blank-to-zero conversion and “pivot_longer()” code from earlier classroom scripts. Richness and abundance summaries, plotting and interpretation were then added following the current practical.
 
-Once each script was complete and running, the Python and R code was checked using their respective debugging tools. ChatGPT was used to brainstorm ways to make the scatter plot clearer and more visually appealing, while the final plotting code was written manually. ChatGPT also helped refine some wording and correct grammar in the README.
+The debugging techniques introduced this week were used to check the R scripts and investigate errors. Further checks used assertions and comparisons of saved outputs to verify the results. 
+
+ChatGPT was used to brainstorm ways to make the scatter plot clearer and more visually appealing, while the final plotting code was written manually. ChatGPT also helped refine some wording and correct grammar in the README.
 
 ## Limitations
 

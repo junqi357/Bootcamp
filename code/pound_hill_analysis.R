@@ -14,6 +14,8 @@ head(MyData)
 dim(MyData)
 str(MyData)
 head(MyMetaData)
+dim(MyMetaData)
+str(MyMetaData)
 
 # Transpose so species become columns and sampled quadrats become rows.
 MyData <- t(MyData) 
@@ -30,7 +32,6 @@ TempData <- as.data.frame(MyData[-1, ], stringsAsFactors = FALSE)
 colnames(TempData) <- MyData[1, ]
 rownames(TempData) <- NULL
 
-# Convert from wide to long form ----------------------------------------
 # Convert from wide to long form using tidyr ----------------------------
 library(tidyr)                                         # Load the package for reshaping data
 
@@ -45,17 +46,22 @@ MyWrangledData$Cultivation <- as.factor(MyWrangledData$Cultivation)
 MyWrangledData$Block <- as.factor(MyWrangledData$Block)
 MyWrangledData$Plot <- as.factor(MyWrangledData$Plot)
 MyWrangledData$Quadrat <- as.factor(MyWrangledData$Quadrat)
-MyWrangledData$Count <- as.integer(MyWrangledData$Count)
+MyWrangledData$Count <- as.numeric(MyWrangledData$Count)
 
 str(MyWrangledData)
 head(MyWrangledData)
 dim(MyWrangledData)
 
 # Check counts before calculating richness.
+# Check counts before calculating richness.
 if (!is.numeric(MyWrangledData$Count) ||
     any(!is.finite(MyWrangledData$Count) |
         MyWrangledData$Count < 0)) {
   stop("Counts must be numeric, finite and non-negative.")
+}
+
+if (any(MyWrangledData$Count %% 1 != 0)) {
+  stop("Counts must be whole numbers.")
 }
 
 # Count species and sampling units using their complete identifiers.
@@ -116,9 +122,13 @@ library(ggplot2)
 
 richness_figure <- ggplot(
   plot_richness,
-  aes(x = Cultivation, y = MeanRichness)
+  aes(
+    x = Cultivation,
+    y = MeanRichness,
+    colour = Cultivation
+  )
 ) +
-  geom_point(size = 3) +
+  geom_point(size = 3.5, alpha = 0.85) +
   scale_x_discrete(
     limits = c("march", "may", "october"),
     labels = c("March", "May", "October")
@@ -127,7 +137,12 @@ richness_figure <- ggplot(
     x = "Cultivation treatment",
     y = "Mean species richness per quadrat"
   ) +
-  theme_bw()
+  theme_bw(base_size = 12) +
+  theme(
+    legend.position = "none",
+    panel.grid.minor = element_blank(),
+    panel.grid.major.x = element_blank()
+  )
 
 ggsave(
   filename = "results/pound_hill_plot_richness.pdf",
@@ -169,10 +184,13 @@ print(aggregate(
   FUN = mean
 ))
 
-## Interpretation of richness and abundance patterns
+## Interpretation of richness
 
 # May cultivation has the highest typical mean quadrat richness across the four plots.
-# Plot values vary within every treatment, ranging from 6.33 to 10.00 in March, 7.40 to 11.60 in May, and 6.40 to 10.25 in October.
-# The figure shows differences among treatments; testing their cause would also require details of the experimental design.
+# Plot values vary within each treatment, and the ranges overlap among treatments.
+# Assessing whether cultivation timing caused these differences would require information about random treatment allocation, the block layout and plot independence.
+
+## Comparison with abundance
+
 # May has the highest mean richness, while October has the highest mean abundance.
-# Richness counts species and abundance counts individual plants, so many individuals of a few species can give high abundance with relatively low richness.
+# Richness counts species and abundance counts individual plants, so a plot containing many individuals of a few species can have high abundance alongside relatively low richness.
