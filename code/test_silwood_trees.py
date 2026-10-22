@@ -286,6 +286,29 @@ assert summarise_oaks([cleaned.copy(), near_match]) == [
 assert summarise_oaks([acer_record]) == []
 assert summarise_oaks([]) == []
 
+# Process one valid oak record and one invalid oak record.
+# Check that only the valid record is accepted and counted in the oak summary.
+valid_oak = record.copy()
+
+invalid_oak = record.copy()
+invalid_oak["record_id"] = "ST002"
+invalid_oak["distance_m"] = "0"
+
+accepted, issues = process_records([valid_oak, invalid_oak])
+
+assert accepted == [cleaned]
+assert issues == [{
+    "source_row": "3",
+    "record_id": "ST002",
+    "reasons": "distance_m out of range",
+}]
+
+oak_counts = summarise_oaks(accepted)
+
+assert oak_counts == [
+    {"species": "robur", "count": "1"},
+]
+
 
 # Give process_records() valid records in reverse record-number order.
 # Check that it returns them sorted and reports no rejected records.
