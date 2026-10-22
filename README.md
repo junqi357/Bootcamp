@@ -161,6 +161,8 @@ The reshaped data is used to count species with a positive count in each quadrat
 
 The same approach is also used for abundance, starting with the total number of individual plants in each quadrat and then averaging these totals within each plot. Finally, the code calculates treatment averages for both richness and abundance and prints them in the terminal, allowing the patterns in species numbers and plant numbers to be compared.
 
+Comments divide the R scripts into stages covering input, validation, calculation and output, and explain key decisions such as converting observed absences to zeros and averaging richness within plots. In "run_get_TreeHeight.sh", comments group checks by purpose, including output content, repeated execution and missing-argument handling. These labels help connect a failed check to the behaviour being tested.
+
 ## Running Scripts and Expected Results
 
 All commands are run from the repository root. The tree-height scripts use base R, while the Pound Hill analysis also requires “tidyr” and “ggplot2” to be installed.
@@ -178,12 +180,18 @@ This run should save the same calculated results to “results/trees_treeheights
 
 The script checks the output structure and calculations, then repeats a run to check file replacement. The test tree is measured at 8 metres and 45 degrees, giving an expected height of 8 metres. It also deliberately leaves out the input argument to check error handling, so the “Usage” message is an expected part of the process. Once all checks pass, meaning the final version completed successfully and will display “All tree-height script checks passed.”
 
+Additional command-line checks confirmed that extra arguments, a missing input file and an incorrect header each produced an informative error and a nonzero exit status.
+
 The Pound Hill analysis is run with:
 `Rscript code/pound_hill_analysis.R`
 
 The run should create “results/pound_hill_plot_richness.csv” and “results/pound_hill_plot_richness.pdf”. The CSV should contain “Cultivation”, “Block”, “Plot” and “MeanRichness”, with one row for each of the 12 plots. Checks confirmed 41 species, 59 quadrats and 12 plots, with each plot appearing once in the summary. The analysis was run twice using separate "Rscript" calls. Comparing the two saved CSV files with "cmp" confirmed identical contents. The regenerated PDF was opened and checked against the table for treatment labels, plot values and readable axis labels.
 
+For October cultivation, block a, plot 1, quadrat richness was recalculated separately using "tapply()" with unused factor levels removed by "droplevels()". The five sampled quadrats had richness values of 7, 8, 7, 5 and 8, giving a mean of 7, which matched "MeanRichness" in the plot summary.
+
 The PDF should show each plot’s mean quadrat richness as one point, allowing the three cultivation treatments to be compared. May has the highest typical richness, and plot values vary within every treatment. The abundance comparison printed in the terminal also shows the highest plant numbers in October, illustrating how richness and abundance describe different aspects of the vegetation.
+
+The four Week 3 commands above were also run from the root of a newly cloned repository. All completed successfully, and the generated tree-height tables and Pound Hill table and figure were inspected.
 
 ## Sources
 

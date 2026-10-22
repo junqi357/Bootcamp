@@ -20,18 +20,29 @@ check_output <- function(input_path, output_path) {
   input <- read.csv(input_path)
   output <- read.csv(output_path)
 
-  stopifnot(identical(
-    names(output),
-    c("Species", "Distance.m", "Angle.degrees", "height_m")
-  ))
-  stopifnot(nrow(output) == nrow(input))
-  stopifnot(isTRUE(all.equal(output[, 1:3], input)))
+  stopifnot(
+    "Output must contain the required four columns" =
+      identical(
+        names(output),
+        c("Species", "Distance.m", "Angle.degrees", "height_m")
+      ),
+    "Output row count must match the input" =
+      nrow(output) == nrow(input),
+    "Original measurements and row order must be preserved" =
+      isTRUE(all.equal(output[, 1:3], input))
+  )
 
-  expected <- input$Distance.m[1] *
-    tan(input$Angle.degrees[1] * pi / 180)
-  stopifnot(isTRUE(all.equal(
-    output$height_m[1], expected, tolerance = 1e-8
-  )))
+  expected <- input$Distance.m *
+    tan(input$Angle.degrees * pi / 180)
+
+  stopifnot(
+    "Every saved height must match the expected calculation" =
+      isTRUE(all.equal(
+        output$height_m,
+        expected,
+        tolerance = 1e-8
+      ))
+  )
 }
 
 check_output("data/trees.csv", "results/trees_treeheights.csv")
