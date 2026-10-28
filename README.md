@@ -141,7 +141,7 @@ This workflow is designed for the small survey provided, so it reads the whole C
 
 - `code/TreeHeight.R` – Calculates tree heights from the supplied tree data.
 - `code/get_TreeHeight.R` – Runs the same calculation using a CSV path supplied in the command.
-- `code/run_get_TreeHeight.sh` – Checks the command-line script using the supplied data and a small test dataset.
+- `code/run_get_TreeHeight.sh` – Checks both tree-height routes, saved output values, repeatability and invalid-input handling.
 - `code/pound_hill_analysis.R` – Calculates and plots mean quadrat species richness for each plot, and compares richness with abundance.
 - `data/trees.csv` – Original tree measurements.
 - `data/pound_hill_data.csv` – Original Pound Hill plant counts and sampling labels.
@@ -153,7 +153,7 @@ This workflow is designed for the small survey provided, so it reads the whole C
 
 Building on this, “get_TreeHeight.R” takes the input path from the run command, allowing the same checks and calculation to be used with other CSV files containing the same three columns. The output is named after the input file, so “trees.csv” produces “trees_treeheights.csv” under “results/” directory. Both scripts use the same input checks and tree-height formula. "TreeHeight.R" uses a fixed input and output path, while "get_TreeHeight.R" obtains the input path from a command-line argument and builds the output filename from its basename.
 
-The calculation is checked through “run_get_TreeHeight.sh”, which runs both the supplied data and a small test dataset. The test includes a tree measured at 8 metres and 45 degrees, with an expected height of 8 metres. The script checks the output columns, row counts, original measurements and calculated height, then repeats a run to confirm that the file is replaced consistently. It also checks that leaving out the input argument produces the expected error message.
+The calculation is checked through "run_get_TreeHeight.sh", which runs both the fixed-path and generalised scripts on the supplied data and also tests the generalised script with an independently predictable measurement of 8 m at 45 degrees. The checks compare output columns, row counts, original measurements and every calculated height. Both routes are rerun to confirm consistent replacement. Invalid calls are tested in isolated temporary directories, where the exit status, expected diagnostic and absence of result files are checked.
 
 “pound_hill_data.csv” contains sampling labels and species counts in a wide table, so “pound_hill_analysis.R” first transposes the data and reshapes it into long form. Each row then holds the count of one species in one quadrat. The accompanying “pound_hill_meta_data.csv” explains that blank counts represent observed absences, which supports converting them to zeros during this step. The code then checks that counts are finite, non-negative numbers and uses the full sampling labels to identify distinct quadrats and plots.
 
@@ -178,7 +178,7 @@ The general version takes an input path when it runs, so the command for the sup
 This run should save the same calculated results to “results/trees_treeheights.csv”. Its checks are brought together in the Shell script:
 `bash code/run_get_TreeHeight.sh`
 
-The script checks the output structure and calculations, then repeats a run to check file replacement. The test tree is measured at 8 metres and 45 degrees, giving an expected height of 8 metres. It also deliberately leaves out the input argument to check error handling, so the “Usage” message is an expected part of the process. Once all checks pass, meaning the final version completed successfully and will display “All tree-height script checks passed.”
+Running "bash code/run_get_TreeHeight.sh" checked the saved measurements and all heights from both tree-height routes, the 8 m toy case and repeatability of both routes. A missing-argument call was checked for the expected usage diagnostic. Both routes were also tested with a zero-distance measurement, confirming the intended distance-range diagnostic and the absence of result files. All checks passed, and the script displayed “All tree-height script checks passed.”
 
 Additional command-line checks confirmed that extra arguments, a missing input file and an incorrect header each produced an informative error and a nonzero exit status.
 
@@ -192,6 +192,10 @@ For October cultivation, block a, plot 1, quadrat richness was recalculated sepa
 The PDF should show each plot’s mean quadrat richness as one point, allowing the three cultivation treatments to be compared. May has the highest typical richness, and plot values vary within every treatment. The abundance comparison printed in the terminal also shows the highest plant numbers in October, illustrating how richness and abundance describe different aspects of the vegetation.
 
 The four Week 3 commands above were also run from the root of a newly cloned repository. All completed successfully, and the generated tree-height tables and Pound Hill table and figure were inspected.
+
+## Revisions Following Formative Feedback
+
+The Shell checks were extended to verify the fixed-path tree-height output and repeatability separately. Invalid-input checks now verify the expected diagnostic and the absence of result files. The revised checks completed successfully. The Pound Hill figure was regenerated with neutral points, a descriptive title and a caption, then visually compared with the saved CSV to confirm that the plotted values matched the summary.
 
 ## Sources
 

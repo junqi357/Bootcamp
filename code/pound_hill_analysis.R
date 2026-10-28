@@ -53,7 +53,6 @@ head(MyWrangledData)
 dim(MyWrangledData)
 
 # Check counts before calculating richness.
-# Check counts before calculating richness.
 if (!is.numeric(MyWrangledData$Count) ||
     any(!is.finite(MyWrangledData$Count) |
         MyWrangledData$Count < 0)) {
@@ -124,19 +123,24 @@ richness_figure <- ggplot(
   plot_richness,
   aes(
     x = Cultivation,
-    y = MeanRichness,
-    colour = Cultivation
+    y = MeanRichness
   )
 ) +
-  geom_point(size = 3.5, alpha = 0.85) +
+  geom_point(
+    colour = "grey30",
+    size = 3.5,
+    alpha = 0.85
+  ) +
   scale_x_discrete(
     limits = c("march", "may", "october"),
     labels = c("March", "May", "October")
   ) +
-  labs(
-    x = "Cultivation treatment",
-    y = "Mean species richness per quadrat"
-  ) +
+labs(
+  title = "Plant species richness at Pound Hill",
+  x = "Cultivation treatment",
+  y = "Mean species richness per quadrat",
+  caption = "Each point represents one plot's mean across sampled quadrats."
+) +
   theme_bw(base_size = 12) +
   theme(
     legend.position = "none",
