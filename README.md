@@ -339,3 +339,14 @@ The errors in `debugging.R` are intentional teaching examples. The first error s
 The classroom practice scripts follow examples and exercises from the MQB chapters on Shell scripting, Biological Computing in Python, Biological Computing in R, and Data Management and Visualization in R, together with the tooling and environment setup appendices. Assignment-specific sources are described in the corresponding sections above.
 
 ChatGPT was used to clarify some of the meaning and behaviour of commands, investigate errors and suggest corrections. Some code was revised based on this assistance. The revised code was then run and checked to confirm that it worked as intended and that the errors being addressed were resolved. Intentional errors and interactive breakpoints retained for debugging practice are explained in the script instructions.
+
+
+
+
+# Final Clean-Clone Check
+
+The portfolio was checked on 4 November 2026 using a fresh GitHub clone, updated to commit `d428753` after correcting the control-flow script placement and README details. The README instructions were followed from the repository root, including the stated directory change for the FASTA commands.
+
+Checks covered Assignments 1–3, all 30 required classroom scripts and the additional classroom examples. The Python tests, doctests and tree-height checks passed. Output checks confirmed 24 accepted and 12 rejected tree-survey records, four oaks of each species, 120 tree-height records and 12 Pound Hill plot summaries. Repeated runs produced identical checked CSV outputs.
+
+Generated figures were visually inspected. Interactive checks covered shell input, Python debugging, R breakpoints and traceback examples, and the R data viewer, plotting and help interface. Intentional teaching errors behaved as documented. The checked working tree remained clean, with generated results excluded from Git.
