@@ -17,7 +17,7 @@ pdf(
 
 hist(
     log(MyDF$Predator.mass),
-    xlab = "Body Mass (g)",
+    xlab = "ln(Body Mass (g))",
     ylab = "Count",
     col = rgb(1, 0, 0, 0.5),           # Red with 50% opacity
     main = "Predator-Prey Size Overlap"

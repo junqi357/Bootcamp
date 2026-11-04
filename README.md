@@ -1,13 +1,37 @@
 # Project Organisation
 
-The assessed assignments use the main project directories:
-- `code/` contains the scripts for the assignments.
-- `data/` contains the input data.
-- `results/` contains generated outputs and is excluded from Git.
+This repository contains Assignments 1–3 and classroom practice scripts from the MQB Computing Bootcamp.
 
-The `week1/` and `git-practice/` directories contain additional
-class exercises and practice files. They are kept for reference
-and are separate from the assessed assignment files.
+- `code/` contains the Unix command answers, shell scripts, Python scripts, R scripts and tests for 3 of the previous weeks' assignments and classroom exercises.
+- `data/` contains the input files needed to run and check the scripts.
+- `results/` stores generated tables and figures. Scripts create this directory when needed, and its contents are excluded from Git.
+- `week1/` contains retained material from the first week's classroom exercises and environment setup.
+- `git-practice/` contains retained material from the introductory Git exercises.
+- `requirements-coursework.txt` records the Python package versions saved during the environment setup exercise.
+- `README.md` describes the project, software requirements, script usage, checks and revisions.
+- `.gitignore` excludes generated results and temporary files from version control.
+
+The following sections provide instructions for Assignments 1–3 and the classroom practice scripts.
+
+
+
+# Software Requirements
+
+The scripts were developed on Ubuntu using Bash, Python and R. Run commands from the repository root unless a specific instruction states otherwise.
+
+- Python 3.10 or later. The Python scripts use standard-library modules. IPython is used for the interactive debugging exercise.
+- R 4.5.2 was used for the R scripts. Additional packages are `reshape2`, `tidyr` and `ggplot2`.
+- Bash and Unix utilities, including `awk`, `basename`, `cat`, `cmp`, `convert`, `expr`, `grep`, `mkdir`, `printf`, `tail`, `tr` and `wc`. The `convert` command is supplied by ImageMagick and is required by `tiff2_png.sh`.
+- An interactive R environment with data-viewer, graphics and help support is used for `r_setup_check.R`. VS Code was used for editing and interactive work.
+
+Install the additional R packages from an R session with:
+
+    install.packages(c("reshape2", "tidyr", "ggplot2"))
+
+`requirements-coursework.txt` records the Python package versions saved during the classroom environment setup exercise. It preserves that environment snapshot; the dependencies needed for the scripts and interactive checks are described above.
+
+
+
 
 # Week 1 Assignment 1: Unix, Shell and Git
 
@@ -64,6 +88,12 @@ Valid conversions produced the expected content, while errors returned a nonzero
 The self-created input 'data/tab-example.tsv' was used to test complete and empty fields, its output kept the empty count field as 'pine,,south'. 
 All four temperature files were converted, and their inputs were compared with copies made before running using 'cmp'. 
 All four comparisons showed that the inputs were unchanged.
+
+## Revisions Following Formative Feedback
+
+Both converter scripts were updated to write to 'results/' when run from the repository root, replacing the previous '../results/' paths. The README commands and output paths were updated accordingly. The existing argument and file checks were retained.
+
+The revised scripts were checked from a fresh checkout without an existing 'results/' directory. Checks covered conversion results, empty fields, unchanged input files, repeated runs and error handling. The README also clarified the assumptions behind the existing FASTA ratio calculation and identified retained classroom practice material.
 
 ## Limitations
 
@@ -123,6 +153,12 @@ The tests use individual assertions, with comments describing the input conditio
 ## Test Example
 
 Finding out how the 'test_silwood_trees.py' works, for example, one test starts with a valid tree record and changes distance_m to "0". It then calls 'validate_record()' and checks that the record is rejected with the reason "distance_m out of range". This checks the lower distance limit in the metadata, which requires a value greater than zero. If the condition were written as 0 <= number <= 100, the script would still run, but it would accept zero. The test would catch this mistake because the returned result would differ from the expected answer.
+
+## Revisions Following Formative Feedback
+
+A combined test was added to 'test_silwood_trees.py' to make the connection between record processing and oak summarisation explicit. It passes one valid oak record and one oak record with zero distance to 'process_records()', checks the accepted record and rejection reason, then passes the accepted records to 'summarise_oaks()'. The expected count confirms that the rejected oak contributes nothing to the summary.
+
+The README was updated to explain this test and the existing assertion-based checks. The test script and cleaning workflow were run from the root of a fresh GitHub clone. Both completed successfully, and the three expected CSV output files were generated.
 
 ## Sources
 
@@ -208,3 +244,98 @@ ChatGPT was used to brainstorm ways to make the scatter plot clearer and more vi
 ## Limitations
 
 “get_TreeHeight.R” uses the input filename to name its output. If files in different folders have the same name, they will share an output path, so a later run may overwrite a result that is still needed. For Pound Hill, the observed differences in richness may be related to cultivation timing, while assessing this relationship requires more information about treatment assignment, block layout and plot independence.
+
+
+
+
+# Classroom Practice Scripts
+
+The classroom scripts cover shell scripting, Python programming, R programming and data handling. The tables below describe each script's purpose, how to run or check it, and its expected behaviour.
+
+Run commands from the repository root. Interactive examples require additional input as described below. Generated files are saved under `results/`.
+
+## Shell Scripts
+
+These examples use Bash and standard Unix utilities. The image conversion script also requires ImageMagick's `convert` command. Run all commands from the repository root.
+
+| Script | Purpose | Running and checking |
+| --- | --- | --- |
+| `variables.sh` | Demonstrates variables, command-line arguments, interactive input and integer addition. | Run `bash code/variables.sh oak pine`. Enter `hello` at the first prompt, then `3 4` at the second. Check that the script reports two arguments, displays the entered string and prints a sum of 7. |
+| `MyExampleScript.sh` | Uses variables to construct a greeting. | Run `bash code/MyExampleScript.sh`. Check that it prints `Hello` followed by the current username from `$USER`. |
+| `boilerplate.sh` | Provides a basic shell script template with descriptive header comments. | Run `bash code/boilerplate.sh`. Check that it prints `This is a shell script!` and exits with status 0. |
+| `CheckLabel.sh` | Uses conditionals to validate a species label. | Run `bash code/CheckLabel.sh oak` and repeat with `pine`. Both should print the selected species. Repeat with `birch`, then with no argument: the exit statuses should be 1 and 2 respectively. |
+| `CountLines.sh` | Counts newline characters in an input file. | Run `bash code/CountLines.sh data/bootcamp_observations.csv`. Compare the reported count with `wc -l < data/bootcamp_observations.csv`. Calls with no argument or a nonexistent input path should report an error and return a nonzero status. |
+| `ConcatenateTwoFiles.sh` | Combines two files in the supplied order using redirection and appending. | Run `bash code/ConcatenateTwoFiles.sh data/temperatures/1800.csv data/temperatures/1801.csv results/combined_temperatures.csv`. Inspect the output to confirm that it contains the first file followed by the second, including both headers. Missing arguments or an output path equal to an input path should produce an error. |
+| `tiff2_png.sh` | Uses a loop to convert TIFF images to PNG. | Run `bash code/tiff2_png.sh`. Each `data/*.tif` input produces a PNG with the same basename under `results/`. Open `results/test_image.png` and compare it with `data/test_image.tif`; both should show the same 100 × 100 image. |
+
+Run `echo $?` immediately after a command to inspect its exit status. Successful commands should return 0. For scripts that create files, repeat the command and compare the regenerated output with the first result.
+
+## Python Scripts
+
+Run these scripts with Python 3 from the repository root. IPython is used for the interactive debugging example.
+
+| Script | Purpose | Running and checking |
+| --- | --- | --- |
+| `loops.py` | Demonstrates iteration over ranges and lists, cumulative addition and a while loop. | Run `python3 code/loops.py`. Check the initial sequence 0–4, the list elements and cumulative totals ending at 1234. The final loop prints 1–100. |
+| `cfexercises1.py` | Demonstrates numerical functions, conditionals and three factorial implementations. | Run `python3 code/cfexercises1.py`. The examples should return 4, 5, `[1, 2, 3]` and three factorial results of 120. Internal assertions also check factorials of 0 and 1. Successful completion prints `Function checks passed.` |
+| `cfexercises2.py` | Combines conditionals, for loops, while loops and break statements. | Run `python3 code/cfexercises2.py`. The first five examples should print `hello` 4, 5, 14, 5 and 8 times respectively. The final example prints `hello!` with numbers 0–5. |
+| `MyExampleScript.py` | Demonstrates defining and calling a function. | Run `python3 code/MyExampleScript.py`. The call `foo(2)` should print 4. |
+| `boilerplate.py` | Demonstrates a main function and a guarded program entry point. | Run `python3 code/boilerplate.py`; it should print `This is a boilerplate`. Check import behaviour with `PYTHONPATH=code python3 -c "import boilerplate"`; the import should complete silently. |
+| `using_name.py` | Demonstrates how `__name__` differs between direct execution and import. | Run `python3 code/using_name.py`; it should report `__main__`. Then run `PYTHONPATH=code python3 -c "import using_name; print(using_name.module_name())"`; it should print `using_name`. |
+| `sysargv.py` | Reads command-line arguments using `sys.argv`. | Run `python3 code/sysargv.py oak pine`. Check that it reports the script path, two arguments and `['oak', 'pine']`. Repeat without arguments and check that the count is 0. |
+| `control_flow.py` | Provides functions for parity, divisors, prime numbers and counting values above a threshold. | Run `python3 code/control_flow.py`. Check the even/odd descriptions, largest divisor 5, prime result for 59 and primes `[2, 3, 5, 7, 11, 13, 17, 19]`. Run its separate tests as described below. |
+| `test_control_flow.py` | Checks ordinary, boundary and invalid inputs for the control-flow functions. | Run `python3 code/test_control_flow.py` and `python3 -m doctest -v code/control_flow.py`. The assertion script should complete silently with status 0, and the three doctest examples should pass. |
+| `observations_practice.py` | Validates observation records, removes exact duplicates and summarises known and missing counts by site. | Run `python3 code/observations_practice.py`. It reads `data/bootcamp_observations.csv` and should print `A (2, 1)` and `B (0, 0)`. |
+| `test_observations_practice.py` | Tests observation summaries, missing values, zeros, duplicates, invalid records and input preservation. | Run `python3 code/test_observations_practice.py`. It reads the ordinary, boundary and invalid observations CSV files under `data/`. Successful completion is silent with status 0. |
+| `debugme.py` | Provides an intentional division-by-zero error for debugger practice. | Start `ipython`, run `%run code/debugme.py`, then enter `%debug` after the error. Inspect `i` and `y`: the failing iteration should have `i = 19` and `y = 0`. Enter `q` to leave the debugger and `exit` to leave IPython. |
+
+The error in `debugme.py` is intentional. The debugging check identifies how repeated subtraction makes the denominator zero. For the assertion-based test scripts, a failed assertion stops execution and identifies the relevant line.
+
+## R Scripts
+
+Run batch examples with `Rscript` from the repository root. The data-wrangling scripts require `reshape2` and `tidyr` respectively. Use an interactive R session for inspecting returned objects and working through `browse.R`.
+
+| Script | Purpose | Running and checking |
+| --- | --- | --- |
+| `basic_io.R` | Demonstrates reading tables, changing import options, writing files and appending rows. | Run `Rscript code/basic_io.R`. It reads `data/trees.csv` and writes `results/MyData.csv`. The append example intentionally produces a column-name warning. The final write replaces the file with a space-separated table containing row names and no column header. Check it with `read.table("results/MyData.csv", header = FALSE, row.names = 1)` in R; it should contain 120 rows and three data columns. |
+| `boilerplate.R` | Demonstrates function arguments, object classes and return values. | In R, run `source("code/boilerplate.R")`, then `MyFunction(1, 2)` and `MyFunction("riki", "Tiki")`. Check the reported argument classes and returned vectors. `class(MyFunction)` should return `"function"`. |
+| `control_flow.R` | Demonstrates if statements, for loops and a while loop. | Run `Rscript code/control_flow.R`. Check the conditional messages, squares from 1 to 100, species names and vector elements. The final while loop should also print squares from 1 to 100. The message controlled by `runif(1)` can vary between runs. |
+| `r_conditionals.R` | Demonstrates conditional functions, default arguments, rounding, powers of two and prime-number checks. | In R, run `source("code/r_conditionals.R")`. Check `is.even(7)`, `is.even.default()`, `report_height(12.345)` and `is.power2(4)`. Expected results include an odd-number description, an even-number description, 12.35 and a power-of-two description. Check `is.prime(0)`, `is.prime(1)`, `is.prime(2)` and `is.prime(4)` for the zero, unit, prime and composite cases. |
+| `break.R` | Demonstrates leaving a while loop with `break`. | Run `Rscript code/break.R`. It should print values of `i` from 0 to 9 and stop when the counter reaches 10. |
+| `next.R` | Demonstrates skipping selected loop iterations with `next`. | Run `Rscript code/next.R`. It should print only 1, 3, 5, 7 and 9. |
+| `try.R` | Demonstrates catching sampling errors while continuing repeated calculations. | Run `Rscript code/try.R`. It creates `results/try_population.pdf`. Some resamples intentionally produce a “too few unique values” error, which `try()` catches. In R, use `source("code/try.R")` and check `length(result)`: all 15 iterations should be represented. |
+| `browse.R` | Demonstrates inspecting an exponential-growth calculation at a breakpoint. | Start R and run `source("code/browse.R")`. At the first `Browse[1]>` prompt, inspect `t` and `N[1:2]`; they should show 2 and approximately `1, 2.718282`. Enter `c` at each breakpoint until the normal `>` prompt returns. Open `results/browse_exponential.pdf` and check the increasing growth curve. |
+| `observations_practice.R` | Imports and validates observations, summarises sites and plots known totals. | Run `Rscript code/observations_practice.R`. It reads the ordinary, boundary and invalid observations CSV files under `data/`. Internal checks cover A: total 2, one missing; B: total 0, none missing; C: total `NA`, two missing; D: total 0, none missing. Open `results/observations_known_totals.pdf` and check these known totals and the explanation for site C. |
+| `data_wrang.R` | Reshapes the Pound Hill data using the legacy `reshape2` approach. | Run `Rscript code/data_wrang.R`. It reads `data/pound_hill_data.csv` and `data/pound_hill_meta_data.csv`, then writes `results/pound_hill_long.csv`. Check that the saved table has 2419 rows and the columns `Cultivation`, `Block`, `Plot`, `Quadrat`, `Species` and `Count`. |
+| `data_wrang_tidy.R` | Performs the Pound Hill reshaping using `tidyr::pivot_longer()`. | Run `Rscript code/data_wrang_tidy.R`. It reads the same Pound Hill inputs and writes `results/pound_hill_long_tidy.csv`. Check for 2419 rows and the same six columns. Compare its records with the legacy output after sorting both tables by the sampling labels and species. |
+
+For interactive checks, start R from the repository root with `R --vanilla`. Enter the expressions shown above at the R prompt.
+
+In `browse.R`, `c` continues execution until the next `browser()` call, so the prompt reappears during successive loop iterations. The normal `>` prompt indicates that the script has finished. The checks described above inspect the first calculated value and the completed figure.
+
+For scripts that create tables or figures, rerun them and compare the saved values or plotted content. `try.R` sets a random seed so its sampling example can be repeated.
+
+## Additional Classroom Examples
+
+These files retain further classroom examples and practice based on MQB topics. Run commands from the repository root. Use an interactive R session for the setup and debugging exercises.
+
+| Script | Purpose | Running and checking |
+| --- | --- | --- |
+| `practice.py` | Demonstrates a range with a specified start, stop and step. | Run `python3 code/practice.py`. Check that it prints 2, 4, 6 and 8. |
+| `example.py` | Demonstrates a function with an executable doctest example in its docstring. | Run `python3 -m doctest -v code/example.py`. The test should confirm that `square(4)` returns 16. |
+| `r_basics.R` | Collects examples of R operators, types, vectors, indexing, data frames, matrices and lists. | In R, run `source("code/r_basics.R", echo = TRUE)` to display the expressions and their results. Check examples such as `plants[2, 1]`, which returns `"Birch"`, and `MyList$species[1]`, which returns `"Quercus robur"`. Random values produced by `runif()` vary between runs. |
+| `debugging.R` | Demonstrates tracing errors through nested functions and debugging a function with an undefined variable. | In a fresh R session, run `source("code/debugging.R")`. The expected error identifies undefined object `d`. Immediately run `traceback()` and inspect the calls through `outer_function`, `middle_function` and `inner_function`. For the second example, run the `buggy_function` definition from the editor separately, then enter `debug(buggy_function)` and `buggy_function(10)`. Inspect `n`, step with `n`, and use `Q` to leave the debugger. |
+| `pred_prey_overlay.R` | Converts prey mass units and overlays predator and prey mass distributions. | Run `Rscript code/pred_prey_overlay.R`. It reads `data/ecol_archives_e_089_51_d_1.csv` and creates `results/Pred_Prey_Overlay.pdf`. Inspect the red predator and blue prey histograms and their legend. The plotted values use natural-log-transformed masses. |
+| `pound_hill_plot.R` | Explores species counts across cultivation treatments using histograms and a summary table. | First run `Rscript code/data_wrang_tidy.R`, then `Rscript code/pound_hill_plot.R`. The plotting script reads `results/pound_hill_long_tidy.csv` and requires `ggplot2`. Check `results/pound_hill_histograms.pdf` for March, May and October panels with shared axes. Inspect `results/pound_hill_summary.csv` for record counts, zero counts, total individuals and zero percentages for each treatment. |
+| `r_setup_check.R` | Checks the R editor integration, data viewer, plotting, help system and installation paths. | Run the file line by line in an interactive R environment with a data viewer and graphics support. Check that `View(df)` opens `mtcars`, `plot(cars)` displays a scatter plot and `?mean` opens help. Inspect `R.home()`, `.libPaths()` and `Sys.which("R")` for the installation and library locations. |
+
+The errors in `debugging.R` are intentional teaching examples. The first error stops `source()` before the second function definition, so the second example is run separately from the editor.
+
+
+
+
+# Sources and AI Assistance
+
+The classroom practice scripts follow examples and exercises from the MQB chapters on Shell scripting, Biological Computing in Python, Biological Computing in R, and Data Management and Visualization in R, together with the tooling and environment setup appendices. Assignment-specific sources are described in the corresponding sections above.
+
+ChatGPT was used to clarify some of the meaning and behaviour of commands, investigate errors and suggest corrections. Some code was revised based on this assistance. The revised code was then run and checked to confirm that it worked as intended and that the errors being addressed were resolved. Intentional errors and interactive breakpoints retained for debugging practice are explained in the script instructions.
