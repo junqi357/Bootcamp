@@ -168,3 +168,37 @@ stopifnot(inherits(invalid_result, "error"))  # Check that an error occurred
 stopifnot(
     grepl("found '-1'", conditionMessage(invalid_result), fixed = TRUE)
 )                                             # Check that the error identifies the invalid count
+
+
+## Plot known totals by site
+
+combined_summary <- rbind(ordinary_summary, boundary_summary)
+
+dir.create("results", showWarnings = FALSE)
+
+pdf("results/observations_known_totals.pdf", width = 7, height = 5)
+
+plot(
+    seq_len(nrow(combined_summary)),
+    combined_summary$total_known,
+    xaxt = "n",
+    xlab = "Site",
+    ylab = "Known total",
+    main = "Known totals by site",
+    ylim = c(0, 3),
+    pch = 19
+)
+
+axis(
+    side = 1,
+    at = seq_len(nrow(combined_summary)),
+    labels = combined_summary$site
+)
+
+mtext(
+    "Site C: all counts are missing; the total is NA.",
+    side = 3,
+    line = 0.3
+)
+
+dev.off()

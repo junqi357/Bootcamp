@@ -1,38 +1,54 @@
 #!/usr/bin/env python3
 
-"""Some functions exemplifying the use of control statements"""
+"""Check the functions in control_flow.py."""
 
-__author__ = 'Your Name (Your.Name@your.email.address)'
-__version__ = '0.0.1'
+from control_flow import (
+    count_above,
+    even_or_odd,
+    find_all_primes,
+    is_prime,
+    largest_divisor_five,
+)
 
-import sys
-import doctest # Import the doctest module
 
-def even_or_odd(x=0):
-    """Find whether a number x is even or odd.
-      
-    >>> even_or_odd(10)
-    '10 is Even!'
-    
-    >>> even_or_odd(5)
-    '5 is Odd!'
-        
-    in case of negative numbers, the positive is taken:    
-    >>> even_or_odd(-2)
-    '-2 is Even!'
-    
-    """
-    #Define function to be tested
-    if x % 2 == 0:
-        return f"{x} is Even!"
-    return f"{x} is Odd!"
+# Check ordinary even and odd integers.
+assert even_or_odd(10) == "10 is Even!"
+assert even_or_odd(5) == "5 is Odd!"
 
-def main(argv): 
-    print(even_or_odd(22))
-    print(even_or_odd(33))
-    return 0
+# Check zero and a negative integer.
+assert even_or_odd(0) == "0 is Even!"
+assert even_or_odd(-2) == "-2 is Even!"
 
-if (__name__ == "__main__"):
-    status = main(sys.argv)
+# Check that text input raises TypeError.
+try:
+    even_or_odd("10")
+except TypeError:
+    pass
+else:
+    raise AssertionError("A non-integer input was accepted")
 
-doctest.testmod()   # To run with embedded tests
+# Check divisors and a value with no divisor among 2–5.
+assert largest_divisor_five(120) == 5
+assert largest_divisor_five(8) == 4
+assert largest_divisor_five(7) is None
+
+# Check values around the first prime.
+assert not is_prime(-1)
+assert not is_prime(0)
+assert not is_prime(1)
+assert is_prime(2)
+assert is_prime(3)
+assert not is_prime(4)
+
+# Check an empty prime range and an ordinary range.
+assert find_all_primes(1) == []
+assert find_all_primes(10) == [2, 3, 5, 7]
+
+# Check an ordinary height collection.
+assert count_above([8, 12, 10, 15], 10) == 2
+
+# Check values below, at and above the threshold.
+assert count_above([9, 10, 11], 10) == 1
+
+# Check an empty collection.
+assert count_above([], 10) == 0

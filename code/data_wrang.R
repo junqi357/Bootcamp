@@ -1,71 +1,65 @@
 # Wrangle the Pound Hill dataset.
-# Run from the coursework project root with:
+# Run from the project root:
 # Rscript code/data_wrang.R
 
-# Load the data ----------------------------------------------------------
-# The first rows describe the sampling design, so do not use one as a header yet.
-MyData <- as.matrix(read.csv("data/pound_hill_data.csv", header = FALSE))
+# Read the sampling labels and counts without assigning a header.
+MyData <- as.matrix(
+    read.csv("data/pound_hill_data.csv", header = FALSE)
+)
 
-# The metadata file does have a header and uses semicolons as separators.
-MyMetaData <- read.csv("data/pound_hill_meta_data.csv", header = TRUE, sep = ";")
+MyMetaData <- read.csv(
+    "data/pound_hill_meta_data.csv",
+    header = TRUE,
+    sep = ";"
+)
 
-# Inspect the data -------------------------------------------------------
 head(MyData)
 dim(MyData)
 str(MyData)
 head(MyMetaData)
 
-# Transpose so species become columns and sampled quadrats become rows.
-MyData <- t(MyData) 
+# Transpose so sampled quadrats become rows.
+MyData <- t(MyData)
+
 head(MyData)
 dim(MyData)
 
-# For this dataset, we have been told that blanks are observed absences.
-# That knowledge is what allows us to record them as zero rather than NA.
+# The metadata identifies blank counts as observed absences.
 MyData[MyData == ""] <- 0
 
-# Convert the raw matrix to a data frame --------------------------------
+TempData <- as.data.frame(
+    MyData[-1, ],
+    stringsAsFactors = FALSE
+)
 
-TempData <- as.data.frame(MyData[-1, ], stringsAsFactors = FALSE)
 colnames(TempData) <- MyData[1, ]
 rownames(TempData) <- NULL
 
-# Convert from wide to long form ----------------------------------------
-# This script keeps the older reshape2 route because it is still common in
-# ecological code. For new work, the chapter introduces tidyr::pivot_longer().
+# Reshape the table using the legacy reshape2 method.
 library(reshape2)
 
 MyWrangledData <- melt(
-  TempData,
-  id = c("Cultivation", "Block", "Plot", "Quadrat"),
-  variable.name = "Species",
-  value.name = "Count"
+    TempData,
+    id = c("Cultivation", "Block", "Plot", "Quadrat"),
+    variable.name = "Species",
+    value.name = "Count"
 )
 
-MyWrangledData[, "Cultivation"] <- as.factor(MyWrangledData[, "Cultivation"])
-MyWrangledData[, "Block"] <- as.factor(MyWrangledData[, "Block"])
-MyWrangledData[, "Plot"] <- as.factor(MyWrangledData[, "Plot"])
-MyWrangledData[, "Quadrat"] <- as.factor(MyWrangledData[, "Quadrat"])
-MyWrangledData[, "Count"] <- as.integer(MyWrangledData[, "Count"])
+MyWrangledData$Cultivation <- as.factor(MyWrangledData$Cultivation)
+MyWrangledData$Block <- as.factor(MyWrangledData$Block)
+MyWrangledData$Plot <- as.factor(MyWrangledData$Plot)
+MyWrangledData$Quadrat <- as.factor(MyWrangledData$Quadrat)
+MyWrangledData$Count <- as.integer(MyWrangledData$Count)
 
 str(MyWrangledData)
 head(MyWrangledData)
 dim(MyWrangledData)
 
-# Save a derived table while leaving the raw files unchanged.
+# Save the derived table separately from the raw data.
 dir.create("results", showWarnings = FALSE)
-write.csv(MyWrangledData, "results/pound_hill_long.csv", row.names = FALSE)
 
-# Explore the data below this line.
-MyData[MyData == ""] <- 0          # Replace observed absences with zero
-
-MyData <- t(MyData)                # Transpose the original matrix
-
-TempData <- as.data.frame(
-    MyData[-1, ],                  # Remove the header row
-    stringsAsFactors = FALSE
+write.csv(
+    MyWrangledData,
+    "results/pound_hill_long.csv",
+    row.names = FALSE
 )
-
-colnames(TempData) <- MyData[1, ]  # Assign the original column names
-
-rownames(TempData) <- NULL         # Reset row names

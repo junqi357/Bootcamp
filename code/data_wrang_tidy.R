@@ -1,46 +1,48 @@
-# Wrangle the Pound Hill dataset.
-# Run from the coursework project root with:
-# Rscript code/data_wrang.R
+# Wrangle the Pound Hill dataset using tidyr.
+# Run from the project root:
+# Rscript code/data_wrang_tidy.R
 
-# Load the data ----------------------------------------------------------
-# The first rows describe the sampling design, so do not use one as a header yet.
-MyData <- as.matrix(read.csv("data/pound_hill_data.csv", header = FALSE))
+# Read the sampling labels and counts without assigning a header.
+MyData <- as.matrix(
+    read.csv("data/pound_hill_data.csv", header = FALSE)
+)
 
-# The metadata file does have a header and uses semicolons as separators.
-MyMetaData <- read.csv("data/pound_hill_meta_data.csv", header = TRUE, sep = ";")
+MyMetaData <- read.csv(
+    "data/pound_hill_meta_data.csv",
+    header = TRUE,
+    sep = ";"
+)
 
-# Inspect the data -------------------------------------------------------
 head(MyData)
 dim(MyData)
 str(MyData)
 head(MyMetaData)
 
-# Transpose so species become columns and sampled quadrats become rows.
-MyData <- t(MyData) 
+# Transpose so sampled quadrats become rows.
+MyData <- t(MyData)
+
 head(MyData)
 dim(MyData)
 
-# For this dataset, we have been told that blanks are observed absences.
-# That knowledge is what allows us to record them as zero rather than NA.
+# The metadata identifies blank counts as observed absences.
 MyData[MyData == ""] <- 0
 
-# Convert the raw matrix to a data frame --------------------------------
+TempData <- as.data.frame(
+    MyData[-1, ],
+    stringsAsFactors = FALSE
+)
 
-TempData <- as.data.frame(MyData[-1, ], stringsAsFactors = FALSE)
 colnames(TempData) <- MyData[1, ]
 rownames(TempData) <- NULL
 
-# Convert from wide to long form ----------------------------------------
-# This script keeps the older reshape2 route because it is still common in
-# ecological code. For new work, the chapter introduces tidyr::pivot_longer().
-# Convert from wide to long form using tidyr ----------------------------
-library(tidyr)                                         # Load the package for reshaping data
+# Reshape the table using tidyr.
+library(tidyr)
 
 MyWrangledData <- TempData |>
     tidyr::pivot_longer(
-        cols = -c(Cultivation, Block, Plot, Quadrat),  # Keep the four identifying columns
-        names_to = "Species",                          # Store species names in one column
-        values_to = "Count"                            # Store species counts in one column
+        cols = -c(Cultivation, Block, Plot, Quadrat),
+        names_to = "Species",
+        values_to = "Count"
     )
 
 MyWrangledData$Cultivation <- as.factor(MyWrangledData$Cultivation)
@@ -53,8 +55,11 @@ str(MyWrangledData)
 head(MyWrangledData)
 dim(MyWrangledData)
 
-# Save a derived table while leaving the raw files unchanged.
+# Save the derived table separately from the raw data.
 dir.create("results", showWarnings = FALSE)
-write.csv(MyWrangledData, "results/pound_hill_long_tidy.csv", row.names = FALSE)
 
-# Explore the data below this line.
+write.csv(
+    MyWrangledData,
+    "results/pound_hill_long_tidy.csv",
+    row.names = FALSE
+)
