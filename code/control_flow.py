@@ -80,11 +80,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
-
-i <- 0
-
-while (i < 10) {
-    i <- i + 1
-    print(i^2)
-}

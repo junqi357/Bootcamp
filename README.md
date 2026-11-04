@@ -7,7 +7,7 @@ This repository contains Assignments 1–3 and classroom practice scripts from t
 - `results/` stores generated tables and figures. Scripts create this directory when needed, and its contents are excluded from Git.
 - `week1/` contains retained material from the first week's classroom exercises and environment setup.
 - `git-practice/` contains retained material from the introductory Git exercises.
-- `requirements-coursework.txt` records the Python package versions saved during the environment setup exercise.
+- `week1/requirements-coursework.txt` records the Python package versions saved during the environment setup exercise.
 - `README.md` describes the project, software requirements, script usage, checks and revisions.
 - `.gitignore` excludes generated results and temporary files from version control.
 
@@ -28,7 +28,7 @@ Install the additional R packages from an R session with:
 
     install.packages(c("reshape2", "tidyr", "ggplot2"))
 
-`requirements-coursework.txt` records the Python package versions saved during the classroom environment setup exercise. It preserves that environment snapshot; the dependencies needed for the scripts and interactive checks are described above.
+`week1/requirements-coursework.txt` records the Python package versions saved during the classroom environment setup exercise. It preserves that environment snapshot; the dependencies needed for the scripts and interactive checks are described above.
 
 
 
@@ -278,7 +278,7 @@ Run these scripts with Python 3 from the repository root. IPython is used for th
 | --- | --- | --- |
 | `loops.py` | Demonstrates iteration over ranges and lists, cumulative addition and a while loop. | Run `python3 code/loops.py`. Check the initial sequence 0–4, the list elements and cumulative totals ending at 1234. The final loop prints 1–100. |
 | `cfexercises1.py` | Demonstrates numerical functions, conditionals and three factorial implementations. | Run `python3 code/cfexercises1.py`. The examples should return 4, 5, `[1, 2, 3]` and three factorial results of 120. Internal assertions also check factorials of 0 and 1. Successful completion prints `Function checks passed.` |
-| `cfexercises2.py` | Combines conditionals, for loops, while loops and break statements. | Run `python3 code/cfexercises2.py`. The first five examples should print `hello` 4, 5, 14, 5 and 8 times respectively. The final example prints `hello!` with numbers 0–5. |
+| `cfexercises2.py` | Combines conditionals, for loops, while loops and break statements. | Run `python3 code/cfexercises2.py`. The first five examples should print `hello` 4, 4, 14, 5 and 8 times respectively. The final example prints `hello!` with numbers 0–5. |
 | `MyExampleScript.py` | Demonstrates defining and calling a function. | Run `python3 code/MyExampleScript.py`. The call `foo(2)` should print 4. |
 | `boilerplate.py` | Demonstrates a main function and a guarded program entry point. | Run `python3 code/boilerplate.py`; it should print `This is a boilerplate`. Check import behaviour with `PYTHONPATH=code python3 -c "import boilerplate"`; the import should complete silently. |
 | `using_name.py` | Demonstrates how `__name__` differs between direct execution and import. | Run `python3 code/using_name.py`; it should report `__main__`. Then run `PYTHONPATH=code python3 -c "import using_name; print(using_name.module_name())"`; it should print `using_name`. |

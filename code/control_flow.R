@@ -32,3 +32,10 @@ v1 <- c("a", "bc", "def")
 for (i in v1) {        # Repeat the loop for each element in v1
     print(i)
 }
+
+i <- 0
+
+while (i < 10) {
+    i <- i + 1
+    print(i^2)
+}
